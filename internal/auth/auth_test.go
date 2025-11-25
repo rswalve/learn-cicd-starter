@@ -1,16 +1,16 @@
 package auth
 
 import (
+	"errors"
 	"net/http"
 	"testing"
-        "errors"
 )
 
 func TestGetAPIKey(t *testing.T) {
 	// Define a structure for test cases
 	type testCase struct {
-		name string
-		headers http.Header
+		name        string
+		headers     http.Header
 		expectedKey string
 		expectedErr error
 	}
@@ -26,11 +26,11 @@ func TestGetAPIKey(t *testing.T) {
 			expectedKey: "my-secret-key-123",
 			expectedErr: nil,
 		},
-		
+
 		// 2. Missing Header
 		{
-			name: "Missing Authorization Header",
-			headers: http.Header{},
+			name:        "Missing Authorization Header",
+			headers:     http.Header{},
 			expectedKey: "",
 			expectedErr: ErrNoAuthHeaderIncluded, // Expecting the specific error variable
 		},
@@ -43,9 +43,9 @@ func TestGetAPIKey(t *testing.T) {
 			},
 			expectedKey: "",
 			// We check for the error string for unexported errors
-			expectedErr: errors.New("malformed authorization header"), 
+			expectedErr: errors.New("malformed authorization header"),
 		},
-		
+
 		// Bonus Malformed Test: Only one part
 		{
 			name: "Malformed Header - Only one part",
