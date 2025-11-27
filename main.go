@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -70,7 +71,13 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer f.Close()
+		// Fix G104: Check the error returned by f.Close()
+		defer func() {
+			if err := f.Close(); err != nil {
+				log.Printf("Error closing static file: %v", err)
+			}
+		}()
+		
 		if _, err := io.Copy(w, f); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
@@ -88,9 +95,18 @@ func main() {
 	v1Router.Get("/healthz", handlerReadiness)
 
 	router.Mount("/v1", v1Router)
+	// FIX G112: Add timeouts to prevent Slowloris attacks (CWE-400)
 	srv := &http.Server{
 		Addr:    ":" + port,
 		Handler: router,
+		// Time allowed to read the request headers. This is the primary fix for G112.
+		ReadHeaderTimeout: 5 * time.Second,
+		// Time allowed for reading the entire request (headers + body).
+		ReadTimeout: 10 * time.Second,
+		// Time allowed for writing the response.
+		WriteTimeout: 10 * time.Second,
+		// Time to wait for the next request on a keep-alive connection.
+		IdleTimeout: 60 * time.Second,
 	}
 
 	log.Printf("Serving on port: %s\n", port)
