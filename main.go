@@ -77,7 +77,7 @@ func main() {
 				log.Printf("Error closing static file: %v", err)
 			}
 		}()
-		
+
 		if _, err := io.Copy(w, f); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
