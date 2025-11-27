@@ -27,4 +27,10 @@ jobs:
 
     steps:
       - name: check formatting
-        run: test -z "$(go fmt ./...)" 
+        run: test -z "$(go fmt ./...)"
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: run staticcheck
+        run: staticcheck ./... 
