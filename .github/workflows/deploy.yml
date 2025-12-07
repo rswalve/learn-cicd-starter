@@ -25,8 +25,7 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
         with:
           # Optional: Set a default project ID for gcloud commands
-          project_id: 'notely-479616
-' 
+          project_id: 'notely-479616'
 
       # STEP C: USE GCLOUD CLI (authentication is now complete)
       - name: 'Run gcloud command'
