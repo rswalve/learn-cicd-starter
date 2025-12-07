@@ -19,4 +19,23 @@ jobs:
           go-version: "1.25.1"
 
       - name: Build the app
-        run: ./scripts/buildprod.sh --project notely-479616
+        run: ./scripts/buildprod.sh
+
+      # STEP A: AUTHENTICATE USING THE JSON KEY SECRET
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          # Reference the GitHub Secret created in the preparation step
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      # STEP B: INSTALL AND CONFIGURE GCLOUD CLI
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          # Optional: Set a default project ID for gcloud commands
+          project_id: 'notely-479616'
+
+      # STEP C: USE GCLOUD CLI (authentication is now complete)
+      - name: 'Build and push Docker image'
+        run: gcloud builds submit --tag us-central1-docker.pkg.dev/notely-479616/notely-ar-repo/notely:latest .
