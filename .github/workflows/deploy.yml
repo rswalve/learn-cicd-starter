@@ -1,0 +1,33 @@
+name: Deploy to GCP
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # STEP A: AUTHENTICATE USING THE JSON KEY SECRET
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          # Reference the GitHub Secret created in the preparation step
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+      # STEP B: INSTALL AND CONFIGURE GCLOUD CLI
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          # Optional: Set a default project ID for gcloud commands
+          project_id: 'notely-479616
+' 
+
+      # STEP C: USE GCLOUD CLI (authentication is now complete)
+      - name: 'Run gcloud command'
+        run: gcloud run services list
