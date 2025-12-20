@@ -26,64 +26,35 @@ func (cfg *apiConfig) handlerNotesGet(w http.ResponseWriter, r *http.Request, us
 }
 
 func (cfg *apiConfig) handlerNotesCreate(w http.ResponseWriter, r *http.Request, user database.User) {
-    type parameters struct {
-        Note string `json:"note"`
-    }
-    decoder := json.NewDecoder(r.Body)
-    params := parameters{}
-    err := decoder.Decode(&params)
-    if err != nil {
-        respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters", err)
-        return
-    }
-
-    // FIX 1: Convert UUID and Time to Strings if sqlc generated them as strings
-    // If sqlc generated them as uuid.UUID/time.Time, remove the .String() and .Format()
-    newNote, err := cfg.DB.CreateNote(r.Context(), database.CreateNoteParams{
-        ID:        uuid.New().String(), 
-        CreatedAt: time.Now().UTC().Format(time.RFC3339), 
-        UpdatedAt: time.Now().UTC().Format(time.RFC3339),
-        Note:      params.Note,
-        UserID:    user.ID, 
-    })
-    
-    // FIX 2: Added the missing 'err' argument to match the 'want' signature
-    if err != nil {
-        respondWithError(w, http.StatusInternalServerError, "Couldn't create note", err)
-        return
-    }
-
-    // FIX 3: Use '=' instead of ':=' because 'err' was already declared above
-    note, err := cfg.DB.GetNote(r.Context(), newNote.ID) 
-    if err != nil {
-        respondWithError(w, http.StatusNotFound, "Couldn't get note", err)
-        return
-    }
-
-    noteResp, err := databaseNoteToNote(note)
-    if err != nil {
-        respondWithError(w, http.StatusInternalServerError, "Couldn't convert note", err)
-        return
-    }
-
-    respondWithJSON(w, http.StatusCreated, noteResp)
-}
-
-	id := uuid.New().String()
-	// 1. Fix the assignment (ensure you aren't reusing := if 'note' was already declared)
-	note, err := cfg.DB.CreateNote(r.Context(), database.CreateNoteParams{
-		ID:        uuid.New(),       // Ensure this matches the type in models.go
-		CreatedAt: time.Now().UTC(), // No longer needs to be cast to string
-		UpdatedAt: time.Now().UTC(),
-		Note:      params.Note,
-		UserID:    user.ID, // Ensure user.ID is also the correct type
-	})
+	type parameters struct {
+		Note string `json:"note"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err := decoder.Decode(&params)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't create note")
+		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters", err)
 		return
 	}
 
-	note, err := cfg.DB.GetNote(r.Context(), id)
+	// FIX 1: Convert UUID and Time to Strings if sqlc generated them as strings
+	// If sqlc generated them as uuid.UUID/time.Time, remove the .String() and .Format()
+	newNote, err := cfg.DB.CreateNote(r.Context(), database.CreateNoteParams{
+		ID:        uuid.New().String(),
+		CreatedAt: time.Now().UTC().Format(time.RFC3339),
+		UpdatedAt: time.Now().UTC().Format(time.RFC3339),
+		Note:      params.Note,
+		UserID:    user.ID,
+	})
+
+	// FIX 2: Added the missing 'err' argument to match the 'want' signature
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create note", err)
+		return
+	}
+
+	// FIX 3: Use '=' instead of ':=' because 'err' was already declared above
+	note, err := cfg.DB.GetNote(r.Context(), newNote.ID)
 	if err != nil {
 		respondWithError(w, http.StatusNotFound, "Couldn't get note", err)
 		return
