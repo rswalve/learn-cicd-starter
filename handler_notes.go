@@ -38,10 +38,10 @@ func (cfg *apiConfig) handlerNotesCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	id := uuid.New().String()
-	err = cfg.DB.CreateNote(r.Context(), database.CreateNoteParams{
-		ID:        id,
-		CreatedAt: time.Now().UTC().Format(time.RFC3339),
-		UpdatedAt: time.Now().UTC().Format(time.RFC3339),
+	note, err := cfg.DB.CreateNote(r.Context(), database.CreateNoteParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
 		Note:      params.Note,
 		UserID:    user.ID,
 	})
