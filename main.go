@@ -15,7 +15,7 @@ import (
 
 	"github.com/bootdotdev/learn-cicd-starter/internal/database"
 
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	_ "github.com//jackc/pgx/v5/stdlib"
 )
 
 type apiConfig struct {
@@ -45,7 +45,7 @@ func main() {
 		log.Println("DATABASE_URL environment variable is not set")
 		log.Println("Running without CRUD endpoints")
 	} else {
-		db, err := sql.Open("libsql", dbURL)
+		db, err := sql.Open("pgx", dbURL)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -27,6 +27,15 @@ jobs:
       - name: Run gosec test
         run: gosec ./...
 
+      - name: Install sqlc
+        uses: sqlc-dev/sqlc-action@v4
+        with:
+          # This will run 'sqlc generate' automatically
+          # and fail the build if the generated code results in a git diff
+          backend: "golang"
+          directory: "."
+      
+
   format-tester:
     name: Style
     runs-on: ubuntu-latest
