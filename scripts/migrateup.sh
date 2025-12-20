@@ -5,4 +5,8 @@ if [ -f .env ]; then
 fi
 
 cd sql/schema
-goose postgres "$DATABASE_URL" up
+
+export GOOSE_DRIVER=postgres
+export GOOSE_DBSTRING='user=postgres password=TestPass!1234 host=35.188.83.64 port=5432 dbname=notely sslmode=require'
+
+goose up
