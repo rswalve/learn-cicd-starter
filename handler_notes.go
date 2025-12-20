@@ -38,15 +38,16 @@ func (cfg *apiConfig) handlerNotesCreate(w http.ResponseWriter, r *http.Request,
 	}
 
 	id := uuid.New().String()
+	// 1. Fix the assignment (ensure you aren't reusing := if 'note' was already declared)
 	note, err := cfg.DB.CreateNote(r.Context(), database.CreateNoteParams{
-		ID:        uuid.New(),
-		CreatedAt: time.Now().UTC(),
+		ID:        uuid.New(),       // Ensure this matches the type in models.go
+		CreatedAt: time.Now().UTC(), // No longer needs to be cast to string
 		UpdatedAt: time.Now().UTC(),
 		Note:      params.Note,
-		UserID:    user.ID,
+		UserID:    user.ID, // Ensure user.ID is also the correct type
 	})
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Couldn't create note", err)
+		respondWithError(w, http.StatusInternalServerError, "Couldn't create note")
 		return
 	}
 
