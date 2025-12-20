@@ -49,8 +49,8 @@ jobs:
       - name: Debug DB URL
         run: echo "DATABASE_URL is '${DATABASE_URL}'" | sed 's/./& /g'
       
-      - name: Run migraations for DB
-        run: ./scripts/migrateup.sh
+      #- name: Run migraations for DB
+      #  run: ./scripts/migrateup.sh
       
         # deploy job in the GitHub actions workflow
       - name: Deploy to Cloud Run
